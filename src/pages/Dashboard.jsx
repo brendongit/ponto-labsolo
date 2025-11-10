@@ -3,11 +3,13 @@ import { usePoint } from '../context/PointContext';
 import { getCurrentMonth, calculateTotalHours, calculateTotalUber, countUberStatus, formatMonth } from '../utils/dateUtils';
 import PointCard from '../components/PointCard';
 import PDFButton from '../components/PDFButton';
+import Toast from '../components/Toast';
 import { Calendar, Clock, DollarSign, TrendingUp } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, records, updateRecord, deleteRecord, getRecordsByMonth } = usePoint();
   const [selectedMonth, setSelectedMonth] = useState(() => getCurrentMonth());
+  const [showToast, setShowToast] = useState(false);
 
   const monthRecords = getRecordsByMonth(selectedMonth.year, selectedMonth.month);
 
@@ -30,6 +32,10 @@ const Dashboard = () => {
 
       return { year: newYear, month: newMonth };
     });
+  };
+
+  const handlePDFGenerated = () => {
+    setShowToast(true);
   };
 
   return (
@@ -104,6 +110,7 @@ const Dashboard = () => {
             records={monthRecords}
             year={selectedMonth.year}
             month={selectedMonth.month}
+            onPDFGenerated={handlePDFGenerated}
           />
         </div>
 
@@ -128,6 +135,13 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {showToast && (
+        <Toast
+          message="Relatório PDF gerado com sucesso!"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 };

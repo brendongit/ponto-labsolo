@@ -2,7 +2,7 @@ import { FileDown } from 'lucide-react';
 import { useState } from 'react';
 import { generatePDF } from '../utils/pdfGenerator';
 
-const PDFButton = ({ userName, records, year, month }) => {
+const PDFButton = ({ userName, records, year, month, onPDFGenerated }) => {
   const [loading, setLoading] = useState(false);
 
   const handleGeneratePDF = async () => {
@@ -14,6 +14,11 @@ const PDFButton = ({ userName, records, year, month }) => {
     try {
       setLoading(true);
       await generatePDF(userName, records, year, month);
+
+      // Chamar callback após sucesso
+      if (onPDFGenerated) {
+        onPDFGenerated();
+      }
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       alert('Erro ao gerar PDF. Por favor, tente novamente.');
