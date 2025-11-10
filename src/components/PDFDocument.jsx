@@ -286,33 +286,37 @@ const PDFDocument = ({ userName, records, monthName, hoursByDay, uberTotals, tot
           <View style={styles.table}>
             {/* Cabeçalho */}
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { width: '15%' }]}>Data</Text>
-              <Text style={[styles.tableHeaderCell, { width: '12%' }]}>Entrada</Text>
-              <Text style={[styles.tableHeaderCell, { width: '12%' }]}>Saída</Text>
-              <Text style={[styles.tableHeaderCell, { width: '12%' }]}>Duração</Text>
-              <Text style={[styles.tableHeaderCell, { width: '14%' }]}>Uber</Text>
-              <Text style={[styles.tableHeaderCell, { width: '14%' }]}>Status</Text>
-              <Text style={[styles.tableHeaderCell, { width: '21%' }]}>Local</Text>
+              <Text style={[styles.tableHeaderCell, { width: '13%' }]}>Data</Text>
+              <Text style={[styles.tableHeaderCell, { width: '10%' }]}>Entrada</Text>
+              <Text style={[styles.tableHeaderCell, { width: '10%' }]}>Saída</Text>
+              <Text style={[styles.tableHeaderCell, { width: '10%' }]}>Duração</Text>
+              <Text style={[styles.tableHeaderCell, { width: '11%' }]}>Uber</Text>
+              <Text style={[styles.tableHeaderCell, { width: '11%' }]}>Status</Text>
+              <Text style={[styles.tableHeaderCell, { width: '10%' }]}>Feriado</Text>
+              <Text style={[styles.tableHeaderCell, { width: '25%' }]}>Local</Text>
             </View>
 
             {/* Linhas */}
             {records.map((record, index) => (
               <View key={record.id} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-                <Text style={[styles.tableCell, { width: '15%' }]}>{formatDate(record.date)}</Text>
-                <Text style={[styles.tableCell, { width: '12%' }]}>{record.entry || '-'}</Text>
-                <Text style={[styles.tableCell, { width: '12%' }]}>{record.exit || '-'}</Text>
-                <Text style={[styles.tableCell, { width: '12%', fontWeight: 'bold' }]}>{record.duration || '-'}</Text>
-                <Text style={[styles.tableCell, { width: '14%' }]}>
+                <Text style={[styles.tableCell, { width: '13%' }]}>{formatDate(record.date)}</Text>
+                <Text style={[styles.tableCell, { width: '10%' }]}>{record.entry || '-'}</Text>
+                <Text style={[styles.tableCell, { width: '10%' }]}>{record.exit || '-'}</Text>
+                <Text style={[styles.tableCell, { width: '10%', fontWeight: 'bold' }]}>{record.duration || '-'}</Text>
+                <Text style={[styles.tableCell, { width: '11%' }]}>
                   {record.uberCost > 0 ? `R$ ${record.uberCost.toFixed(2)}` : '-'}
                 </Text>
                 <Text style={[
                   styles.tableCell,
-                  { width: '14%' },
+                  { width: '11%' },
                   record.uberCost > 0 ? (record.paid ? styles.statusPaid : styles.statusUnpaid) : {}
                 ]}>
                   {record.uberCost > 0 ? (record.paid ? 'Pago' : 'Não pago') : '-'}
                 </Text>
-                <Text style={[styles.tableCellLocation, { width: '21%' }]}>{record.location || '-'}</Text>
+                <Text style={[styles.tableCell, { width: '10%', color: record.isHoliday ? '#F59E0B' : '#6B7280' }]}>
+                  {record.isHoliday ? 'Sim' : '-'}
+                </Text>
+                <Text style={[styles.tableCellLocation, { width: '25%' }]}>{record.location || '-'}</Text>
               </View>
             ))}
           </View>
@@ -341,6 +345,15 @@ const PDFDocument = ({ userName, records, monthName, hoursByDay, uberTotals, tot
                 <Text style={styles.totalizerLabel}>Total de horas no Domingo:</Text>
               </View>
               <Text style={styles.totalizerValueOrange}>{hoursByDay.sunday}</Text>
+            </View>
+            <View style={styles.lightSeparator} />
+
+            <View style={styles.totalizerRow}>
+              <View style={styles.totalizerLeft}>
+                <ClockIcon size={10} color="#F59E0B" />
+                <Text style={styles.totalizerLabel}>Total de horas em Feriados:</Text>
+              </View>
+              <Text style={styles.totalizerValueOrange}>{hoursByDay.holiday}</Text>
             </View>
             <View style={styles.lightSeparator} />
 

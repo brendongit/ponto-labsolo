@@ -62,6 +62,17 @@ const PointCard = ({ record, onUpdate, onDelete }) => {
             />
           </div>
         </div>
+        <div className="mb-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={editData.isHoliday || false}
+              onChange={(e) => setEditData({ ...editData, isHoliday: e.target.checked })}
+              className="w-4 h-4 text-orange-500 rounded focus:ring-orange-500"
+            />
+            <span className="text-sm text-gray-700">Marcar como Feriado</span>
+          </label>
+        </div>
         <div className="flex gap-2 justify-end">
           <button
             onClick={handleCancel}
@@ -86,7 +97,14 @@ const PointCard = ({ record, onUpdate, onDelete }) => {
     <div className="bg-white rounded-lg shadow-md p-4 mb-3">
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
-          <div className="text-sm font-semibold text-gray-800">{formatDate(record.date)}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-semibold text-gray-800">{formatDate(record.date)}</div>
+            {record.isHoliday && (
+              <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
+                Feriado
+              </span>
+            )}
+          </div>
           <div className="text-xs text-gray-500 mt-1">{record.location}</div>
         </div>
         <div className="flex gap-2">

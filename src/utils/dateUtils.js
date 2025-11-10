@@ -58,6 +58,7 @@ export const calculateHoursByDayType = (records) => {
   let saturdayMinutes = 0;
   let sundayMinutes = 0;
   let weekdayMinutes = 0;
+  let holidayMinutes = 0;
 
   records.forEach(record => {
     if (record.duration) {
@@ -66,17 +67,22 @@ export const calculateHoursByDayType = (records) => {
       );
       const totalMinutes = hours * 60 + minutes;
 
-      // Garantir que a data seja interpretada no timezone local
-      const [year, month, day] = record.date.split('-').map(Number);
-      const date = new Date(year, month - 1, day); // month é 0-indexed
-      const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
-
-      if (dayOfWeek === 0) {
-        sundayMinutes += totalMinutes;
-      } else if (dayOfWeek === 6) {
-        saturdayMinutes += totalMinutes;
+      // Verificar se está marcado como feriado primeiro
+      if (record.isHoliday) {
+        holidayMinutes += totalMinutes;
       } else {
-        weekdayMinutes += totalMinutes;
+        // Garantir que a data seja interpretada no timezone local
+        const [year, month, day] = record.date.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month é 0-indexed
+        const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+
+        if (dayOfWeek === 0) {
+          sundayMinutes += totalMinutes;
+        } else if (dayOfWeek === 6) {
+          saturdayMinutes += totalMinutes;
+        } else {
+          weekdayMinutes += totalMinutes;
+        }
       }
     }
   });
@@ -90,7 +96,8 @@ export const calculateHoursByDayType = (records) => {
   return {
     saturday: formatMinutes(saturdayMinutes),
     sunday: formatMinutes(sundayMinutes),
-    weekday: formatMinutes(weekdayMinutes)
+    weekday: formatMinutes(weekdayMinutes),
+    holiday: formatMinutes(holidayMinutes)
   };
 };
 
