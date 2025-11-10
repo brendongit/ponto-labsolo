@@ -1,5 +1,15 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { formatDate } from '../utils/dateUtils';
+import {
+  CalendarIcon,
+  ClockIcon,
+  DollarSignIcon,
+  CheckIcon,
+  XIcon,
+  ListIcon,
+  BarChart3Icon,
+  UserIcon
+} from './PDFIcons';
 
 // Estilos CSS-like para o PDF
 const styles = StyleSheet.create({
@@ -27,6 +37,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginBottom: 8,
   },
+  headerInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   headerInfo: {
     fontSize: 9,
     opacity: 0.9,
@@ -52,10 +66,14 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     borderStyle: 'solid',
   },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   cardLabel: {
     fontSize: 8,
     color: '#6B7280',
-    marginBottom: 4,
     textTransform: 'uppercase',
   },
   cardValue: {
@@ -68,15 +86,19 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1F2937',
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
     paddingBottom: 4,
     borderBottomWidth: 2,
     borderBottomColor: '#3B82F6',
     borderBottomStyle: 'solid',
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1F2937',
   },
 
   // Tabela
@@ -133,14 +155,19 @@ const styles = StyleSheet.create({
   // Totalizadores
   totalizersBox: {
     backgroundColor: '#F3F4F6',
-    padding: 16,
+    padding: 12,
     borderRadius: 8,
-    marginTop: 10,
+    marginTop: 8,
   },
   totalizerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  totalizerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   totalizerLabel: {
     fontSize: 9,
@@ -179,7 +206,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#D1D5DB',
     borderTopStyle: 'solid',
-    marginVertical: 8,
+    marginVertical: 6,
+  },
+  lightSeparator: {
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    borderTopStyle: 'solid',
+    marginVertical: 3,
   },
 
   // Footer
@@ -200,7 +233,7 @@ const styles = StyleSheet.create({
 });
 
 // Componente do PDF
-const PDFDocument = ({ userName, records, monthName, hoursByDay, uberTotals }) => {
+const PDFDocument = ({ userName, records, monthName, hoursByDay, uberTotals, totalHours }) => {
   const now = new Date();
   const generatedDate = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
 
@@ -211,25 +244,44 @@ const PDFDocument = ({ userName, records, monthName, hoursByDay, uberTotals }) =
         <View style={styles.header}>
           <Text style={styles.headerTitle}>MeuPonto</Text>
           <Text style={styles.headerSubtitle}>Relatório de Registro de Ponto</Text>
-          <Text style={styles.headerInfo}>{userName} • {monthName}</Text>
+          <View style={styles.headerInfoContainer}>
+            <UserIcon size={10} color="#E0E7FF" />
+            <Text style={styles.headerInfo}>{userName} • {monthName}</Text>
+          </View>
           <Text style={styles.headerDate}>Gerado em {generatedDate}</Text>
         </View>
 
         {/* Cards de Resumo */}
         <View style={styles.cardsContainer}>
           <View style={styles.card}>
-            <Text style={styles.cardLabel}>Dias Trabalhados</Text>
+            <View style={styles.cardHeader}>
+              <CalendarIcon size={10} color="#3B82F6" />
+              <Text style={styles.cardLabel}>Dias Trabalhados</Text>
+            </View>
             <Text style={styles.cardValue}>{records.length} dias</Text>
           </View>
           <View style={styles.card}>
-            <Text style={styles.cardLabel}>Total de Uber</Text>
+            <View style={styles.cardHeader}>
+              <ClockIcon size={10} color="#10B981" />
+              <Text style={styles.cardLabel}>Total de Horas</Text>
+            </View>
+            <Text style={styles.cardValue}>{totalHours}</Text>
+          </View>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <DollarSignIcon size={10} color="#A855F7" />
+              <Text style={styles.cardLabel}>Total de Uber</Text>
+            </View>
             <Text style={styles.cardValue}>R$ {uberTotals.total.toFixed(2)}</Text>
           </View>
         </View>
 
         {/* Tabela de Registros */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Registros do Período</Text>
+          <View style={styles.sectionTitleContainer}>
+            <ListIcon size={14} color="#3B82F6" />
+            <Text style={styles.sectionTitle}>Registros do Período</Text>
+          </View>
 
           <View style={styles.table}>
             {/* Cabeçalho */}
@@ -268,43 +320,72 @@ const PDFDocument = ({ userName, records, monthName, hoursByDay, uberTotals }) =
 
         {/* Totalizadores */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Totalizadores</Text>
+          <View style={styles.sectionTitleContainer}>
+            <BarChart3Icon size={14} color="#3B82F6" />
+            <Text style={styles.sectionTitle}>Totalizadores</Text>
+          </View>
 
           <View style={styles.totalizersBox}>
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de horas no Sábado:</Text>
+              <View style={styles.totalizerLeft}>
+                <ClockIcon size={10} color="#A855F7" />
+                <Text style={styles.totalizerLabel}>Total de horas no Sábado:</Text>
+              </View>
               <Text style={styles.totalizerValuePurple}>{hoursByDay.saturday}</Text>
             </View>
+            <View style={styles.lightSeparator} />
 
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de horas no Domingo:</Text>
+              <View style={styles.totalizerLeft}>
+                <ClockIcon size={10} color="#FB923C" />
+                <Text style={styles.totalizerLabel}>Total de horas no Domingo:</Text>
+              </View>
               <Text style={styles.totalizerValueOrange}>{hoursByDay.sunday}</Text>
             </View>
+            <View style={styles.lightSeparator} />
 
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de horas nos dias de semana:</Text>
+              <View style={styles.totalizerLeft}>
+                <ClockIcon size={10} color="#3B82F6" />
+                <Text style={styles.totalizerLabel}>Total de horas nos dias de semana:</Text>
+              </View>
               <Text style={styles.totalizerValueBlue}>{hoursByDay.weekday}</Text>
             </View>
+            <View style={styles.lightSeparator} />
 
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de dias trabalhados:</Text>
+              <View style={styles.totalizerLeft}>
+                <CalendarIcon size={10} color="#6B7280" />
+                <Text style={styles.totalizerLabel}>Total de dias trabalhados:</Text>
+              </View>
               <Text style={styles.totalizerValue}>{records.length} dias</Text>
             </View>
 
             <View style={styles.separator} />
 
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de Uber (geral):</Text>
+              <View style={styles.totalizerLeft}>
+                <DollarSignIcon size={10} color="#6B7280" />
+                <Text style={styles.totalizerLabel}>Total de Uber (geral):</Text>
+              </View>
               <Text style={styles.totalizerValue}>R$ {uberTotals.total.toFixed(2)}</Text>
             </View>
+            <View style={styles.lightSeparator} />
 
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de Uber pago:</Text>
+              <View style={styles.totalizerLeft}>
+                <CheckIcon size={10} color="#10B981" />
+                <Text style={styles.totalizerLabel}>Total de Uber pago:</Text>
+              </View>
               <Text style={styles.totalizerValueGreen}>R$ {uberTotals.paid.toFixed(2)}</Text>
             </View>
+            <View style={styles.lightSeparator} />
 
             <View style={styles.totalizerRow}>
-              <Text style={styles.totalizerLabel}>Total de Uber não pago:</Text>
+              <View style={styles.totalizerLeft}>
+                <XIcon size={10} color="#EF4444" />
+                <Text style={styles.totalizerLabel}>Total de Uber não pago:</Text>
+              </View>
               <Text style={styles.totalizerValueRed}>R$ {uberTotals.unpaid.toFixed(2)}</Text>
             </View>
           </View>
