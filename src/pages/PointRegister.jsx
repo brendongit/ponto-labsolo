@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { usePoint } from '../context/PointContext';
 import { LogIn, LogOut, MapPin, DollarSign, X } from 'lucide-react';
 import { getCurrentLocation } from '../utils/geolocation';
+import { formatDate } from '../utils/dateUtils';
 
 const PointRegister = () => {
   const { currentEntry, registerEntry, registerExit } = usePoint();
@@ -74,7 +75,7 @@ const PointRegister = () => {
                 <div className="font-semibold text-blue-900 mb-1">Entrada Registrada</div>
                 <div className="text-sm text-blue-700">
                   <div>Horário: <span className="font-medium">{currentEntry.entry}</span></div>
-                  <div>Data: <span className="font-medium">{new Date(currentEntry.date).toLocaleDateString('pt-BR')}</span></div>
+                  <div>Data: <span className="font-medium">{formatDate(currentEntry.date)}</span></div>
                   <div className="flex items-center gap-1 mt-1">
                     <MapPin size={14} />
                     <span>{currentEntry.location}</span>

@@ -24,6 +24,15 @@ const PointCard = ({ record, onUpdate, onDelete }) => {
     return (
       <div className="bg-white rounded-lg shadow-md p-4 mb-3">
         <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="col-span-2">
+            <label className="block text-xs text-gray-600 mb-1">Data</label>
+            <input
+              type="date"
+              value={editData.date}
+              onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+              className="w-full px-2 py-1 border rounded text-sm"
+            />
+          </div>
           <div>
             <label className="block text-xs text-gray-600 mb-1">Entrada</label>
             <input

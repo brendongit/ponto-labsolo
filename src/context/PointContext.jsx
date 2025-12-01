@@ -45,9 +45,15 @@ export const PointProvider = ({ children }) => {
 
   const registerEntry = (location) => {
     const now = new Date();
+    // Usar data local ao invés de UTC para evitar problemas de fuso horário
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const localDate = `${year}-${month}-${day}`;
+
     const entry = {
       id: uuidv4(),
-      date: now.toISOString().split('T')[0],
+      date: localDate,
       entry: now.toTimeString().slice(0, 5),
       location: location || 'Não especificado'
     };
