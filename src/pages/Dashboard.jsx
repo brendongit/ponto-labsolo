@@ -7,7 +7,7 @@ import Toast from '../components/Toast';
 import { Calendar, Clock, DollarSign, TrendingUp } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, records, updateRecord, deleteRecord, getRecordsByMonth } = usePoint();
+  const { user, records, updateRecord, deleteRecord, getRecordsByMonth, salaryConfig } = usePoint();
   const [selectedMonth, setSelectedMonth] = useState(() => getCurrentMonth());
   const [showToast, setShowToast] = useState(false);
 
@@ -110,6 +110,7 @@ const Dashboard = () => {
             records={monthRecords}
             year={selectedMonth.year}
             month={selectedMonth.month}
+            salaryConfig={salaryConfig}
             onPDFGenerated={handlePDFGenerated}
           />
         </div>

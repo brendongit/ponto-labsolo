@@ -27,6 +27,11 @@ export const PointProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [salaryConfig, setSalaryConfig] = useState(() => {
+    const saved = localStorage.getItem('meuPonto_salaryConfig');
+    return saved ? JSON.parse(saved) : { salary: 0, totalHoursMonth: 0 };
+  });
+
   useEffect(() => {
     localStorage.setItem('meuPonto_user', JSON.stringify(user));
   }, [user]);
@@ -42,6 +47,10 @@ export const PointProvider = ({ children }) => {
       localStorage.removeItem('meuPonto_currentEntry');
     }
   }, [currentEntry]);
+
+  useEffect(() => {
+    localStorage.setItem('meuPonto_salaryConfig', JSON.stringify(salaryConfig));
+  }, [salaryConfig]);
 
   const registerEntry = (location) => {
     const now = new Date();
@@ -147,6 +156,10 @@ export const PointProvider = ({ children }) => {
     setUser(prev => ({ ...prev, ...newUserData }));
   };
 
+  const updateSalaryConfig = (newConfig) => {
+    setSalaryConfig(prev => ({ ...prev, ...newConfig }));
+  };
+
   const value = {
     user,
     updateUser,
@@ -156,7 +169,9 @@ export const PointProvider = ({ children }) => {
     registerExit,
     updateRecord,
     deleteRecord,
-    getRecordsByMonth
+    getRecordsByMonth,
+    salaryConfig,
+    updateSalaryConfig
   };
 
   return (

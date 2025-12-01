@@ -1,13 +1,10 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import { formatDate } from "../utils/dateUtils";
+import { formatDate, getDayType } from "../utils/dateUtils";
 import {
   CalendarIcon,
   ClockIcon,
   DollarSignIcon,
-  CheckIcon,
-  XIcon,
   ListIcon,
-  BarChart3Icon,
   UserIcon,
 } from "./PDFIcons";
 
@@ -246,6 +243,7 @@ const PDFDocument = ({
   hoursByDay,
   uberTotals,
   totalHours,
+  payment,
 }) => {
   const now = new Date();
   const generatedDate = `${now.toLocaleDateString(
@@ -273,15 +271,8 @@ const PDFDocument = ({
           <Text style={styles.headerDate}>Gerado em {generatedDate}</Text>
         </View>
 
-        {/* Cards de Resumo */}
+        {/* Cards de Resumo - Primeira Linha */}
         <View style={styles.cardsContainer}>
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <CalendarIcon size={10} color="#3B82F6" />
-              <Text style={styles.cardLabel}>Dias Trabalhados</Text>
-            </View>
-            <Text style={styles.cardValue}>{records.length} dias</Text>
-          </View>
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <ClockIcon size={10} color="#10B981" />
@@ -306,6 +297,45 @@ const PDFDocument = ({
               Pago: R$ {uberTotals.paid.toFixed(2)} | Não pago: R${" "}
               {uberTotals.unpaid.toFixed(2)}
             </Text>
+          </View>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <DollarSignIcon size={10} color="#F59E0B" />
+              <Text style={styles.cardLabel}>Pagamento</Text>
+            </View>
+            <Text style={styles.cardValue}>
+              R$ {payment.total.toFixed(2)}
+            </Text>
+            <Text style={styles.cardDetails}>
+              Semana: R$ {payment.weekday.toFixed(2)} | Sáb: R$ {payment.saturday.toFixed(2)}
+              {"\n"}
+              Dom: R$ {payment.sunday.toFixed(2)} | Fer: R$ {payment.holiday.toFixed(2)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Cards de Resumo - Segunda Linha */}
+        <View style={[styles.cardsContainer, { marginTop: 10 }]}>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <CalendarIcon size={10} color="#3B82F6" />
+              <Text style={styles.cardLabel}>Dias Trabalhados</Text>
+            </View>
+            <Text style={styles.cardValue}>{records.length} dias</Text>
+          </View>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <ClockIcon size={10} color="#6B7280" />
+              <Text style={styles.cardLabel}>Valor Hora Base</Text>
+            </View>
+            <Text style={styles.cardValue}>
+              {payment.hourValue > 0 ? `R$ ${payment.hourValue.toFixed(2)}/h` : '-'}
+            </Text>
+            {payment.hourValue > 0 && (
+              <Text style={styles.cardDetails}>
+                Sáb 70% | Dom 100% | Feriado 100%
+              </Text>
+            )}
           </View>
         </View>
 
@@ -337,185 +367,93 @@ const PDFDocument = ({
               <Text style={[styles.tableHeaderCell, { width: "11%" }]}>
                 Status
               </Text>
-              <Text style={[styles.tableHeaderCell, { width: "10%" }]}>
-                Feriado
+              <Text style={[styles.tableHeaderCell, { width: "13%" }]}>
+                Tipo de Dia
               </Text>
-              <Text style={[styles.tableHeaderCell, { width: "25%" }]}>
+              <Text style={[styles.tableHeaderCell, { width: "22%" }]}>
                 Local
               </Text>
             </View>
 
             {/* Linhas */}
-            {records.map((record, index) => (
-              <View
-                key={record.id}
-                style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
-              >
-                <Text style={[styles.tableCell, { width: "13%" }]}>
-                  {formatDate(record.date)}
-                </Text>
-                <Text style={[styles.tableCell, { width: "10%" }]}>
-                  {record.entry || "-"}
-                </Text>
-                <Text style={[styles.tableCell, { width: "10%" }]}>
-                  {record.exit || "-"}
-                </Text>
-                <Text
-                  style={[
-                    styles.tableCell,
-                    { width: "10%", fontWeight: "bold" },
-                  ]}
+            {records.map((record, index) => {
+              const dayType = getDayType(record.date);
+              let dayTypeLabel = "Dia de semana";
+              let dayTypeColor = "#3B82F6";
+
+              if (record.isHoliday) {
+                dayTypeLabel = "Feriado";
+                dayTypeColor = "#F59E0B";
+              } else if (dayType === 'saturday') {
+                dayTypeLabel = "Sábado";
+                dayTypeColor = "#A855F7";
+              } else if (dayType === 'sunday') {
+                dayTypeLabel = "Domingo";
+                dayTypeColor = "#FB923C";
+              }
+
+              return (
+                <View
+                  key={record.id}
+                  style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
                 >
-                  {record.duration || "-"}
-                </Text>
-                <Text style={[styles.tableCell, { width: "11%" }]}>
-                  {record.uberCost > 0
-                    ? `R$ ${record.uberCost.toFixed(2)}`
-                    : "-"}
-                </Text>
-                <Text
-                  style={[
-                    styles.tableCell,
-                    { width: "11%" },
-                    record.uberCost > 0
+                  <Text style={[styles.tableCell, { width: "13%" }]}>
+                    {formatDate(record.date)}
+                  </Text>
+                  <Text style={[styles.tableCell, { width: "10%" }]}>
+                    {record.entry || "-"}
+                  </Text>
+                  <Text style={[styles.tableCell, { width: "10%" }]}>
+                    {record.exit || "-"}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      { width: "10%", fontWeight: "bold" },
+                    ]}
+                  >
+                    {record.duration || "-"}
+                  </Text>
+                  <Text style={[styles.tableCell, { width: "11%" }]}>
+                    {record.uberCost > 0
+                      ? `R$ ${record.uberCost.toFixed(2)}`
+                      : "-"}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      { width: "11%" },
+                      record.uberCost > 0
+                        ? record.paid
+                          ? styles.statusPaid
+                          : styles.statusUnpaid
+                        : {},
+                    ]}
+                  >
+                    {record.uberCost > 0
                       ? record.paid
-                        ? styles.statusPaid
-                        : styles.statusUnpaid
-                      : {},
-                  ]}
-                >
-                  {record.uberCost > 0
-                    ? record.paid
-                      ? "Pago"
-                      : "Não pago"
-                    : "-"}
-                </Text>
-                <Text
-                  style={[
-                    styles.tableCell,
-                    {
-                      width: "10%",
-                      color: record.isHoliday ? "#F59E0B" : "#6B7280",
-                    },
-                  ]}
-                >
-                  {record.isHoliday ? "Sim" : "-"}
-                </Text>
-                <Text style={[styles.tableCellLocation, { width: "25%" }]}>
-                  {record.location || "-"}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Totalizadores */}
-        <View style={styles.section}>
-          <View style={styles.sectionTitleContainer}>
-            <BarChart3Icon size={14} color="#3B82F6" />
-            <Text style={styles.sectionTitle}>Totalizadores</Text>
-          </View>
-
-          <View style={styles.totalizersBox}>
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <ClockIcon size={10} color="#A855F7" />
-                <Text style={styles.totalizerLabel}>
-                  Total de horas no Sábado:
-                </Text>
-              </View>
-              <Text style={styles.totalizerValuePurple}>
-                {hoursByDay.saturday}
-              </Text>
-            </View>
-            <View style={styles.lightSeparator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <ClockIcon size={10} color="#FB923C" />
-                <Text style={styles.totalizerLabel}>
-                  Total de horas no Domingo:
-                </Text>
-              </View>
-              <Text style={styles.totalizerValueOrange}>
-                {hoursByDay.sunday}
-              </Text>
-            </View>
-            <View style={styles.lightSeparator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <ClockIcon size={10} color="#F59E0B" />
-                <Text style={styles.totalizerLabel}>
-                  Total de horas em Feriados:
-                </Text>
-              </View>
-              <Text style={styles.totalizerValueOrange}>
-                {hoursByDay.holiday}
-              </Text>
-            </View>
-            <View style={styles.lightSeparator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <ClockIcon size={10} color="#3B82F6" />
-                <Text style={styles.totalizerLabel}>
-                  Total de horas nos dias de semana:
-                </Text>
-              </View>
-              <Text style={styles.totalizerValueBlue}>
-                {hoursByDay.weekday}
-              </Text>
-            </View>
-            <View style={styles.lightSeparator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <CalendarIcon size={10} color="#6B7280" />
-                <Text style={styles.totalizerLabel}>
-                  Total de dias trabalhados:
-                </Text>
-              </View>
-              <Text style={styles.totalizerValue}>{records.length} dias</Text>
-            </View>
-
-            <View style={styles.separator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <DollarSignIcon size={10} color="#6B7280" />
-                <Text style={styles.totalizerLabel}>
-                  Total de Uber (geral):
-                </Text>
-              </View>
-              <Text style={styles.totalizerValue}>
-                R$ {uberTotals.total.toFixed(2)}
-              </Text>
-            </View>
-            <View style={styles.lightSeparator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <CheckIcon size={10} color="#10B981" />
-                <Text style={styles.totalizerLabel}>Total de Uber pago:</Text>
-              </View>
-              <Text style={styles.totalizerValueGreen}>
-                R$ {uberTotals.paid.toFixed(2)}
-              </Text>
-            </View>
-            <View style={styles.lightSeparator} />
-
-            <View style={styles.totalizerRow}>
-              <View style={styles.totalizerLeft}>
-                <XIcon size={10} color="#EF4444" />
-                <Text style={styles.totalizerLabel}>
-                  Total de Uber não pago:
-                </Text>
-              </View>
-              <Text style={styles.totalizerValueRed}>
-                R$ {uberTotals.unpaid.toFixed(2)}
-              </Text>
-            </View>
+                        ? "Pago"
+                        : "Não pago"
+                      : "-"}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      {
+                        width: "13%",
+                        color: dayTypeColor,
+                        fontWeight: record.isHoliday || dayType !== 'weekday' ? 'bold' : 'normal',
+                      },
+                    ]}
+                  >
+                    {dayTypeLabel}
+                  </Text>
+                  <Text style={[styles.tableCellLocation, { width: "22%" }]}>
+                    {record.location || "-"}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         </View>
 

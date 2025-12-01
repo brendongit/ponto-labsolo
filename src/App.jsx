@@ -3,6 +3,7 @@ import { PointProvider } from './context/PointContext';
 import Navigation from './components/Navigation';
 import Dashboard from './pages/Dashboard';
 import PointRegister from './pages/PointRegister';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/ponto" element={<PointRegister />} />
+              <Route path="/configuracoes" element={<Settings />} />
             </Routes>
           </main>
         </div>

@@ -2,7 +2,7 @@ import { FileDown } from 'lucide-react';
 import { useState } from 'react';
 import { generatePDF } from '../utils/pdfGenerator';
 
-const PDFButton = ({ userName, records, year, month, onPDFGenerated }) => {
+const PDFButton = ({ userName, records, year, month, salaryConfig, onPDFGenerated }) => {
   const [loading, setLoading] = useState(false);
 
   const handleGeneratePDF = async () => {
@@ -13,7 +13,7 @@ const PDFButton = ({ userName, records, year, month, onPDFGenerated }) => {
 
     try {
       setLoading(true);
-      await generatePDF(userName, records, year, month);
+      await generatePDF(userName, records, year, month, salaryConfig);
 
       // Chamar callback após sucesso
       if (onPDFGenerated) {

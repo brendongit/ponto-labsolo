@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Clock } from 'lucide-react';
+import { Home, Clock, Settings } from 'lucide-react';
 
 const Navigation = () => {
   return (
@@ -32,6 +32,20 @@ const Navigation = () => {
           >
             <Clock size={20} />
             <span className="hidden md:inline">Bater Ponto</span>
+          </NavLink>
+
+          <NavLink
+            to="/configuracoes"
+            className={({ isActive }) =>
+              `flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                isActive
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`
+            }
+          >
+            <Settings size={20} />
+            <span className="hidden md:inline">Configurações</span>
           </NavLink>
         </div>
       </div>

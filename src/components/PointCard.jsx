@@ -1,5 +1,5 @@
 import { Pencil, Trash2, Check, X } from 'lucide-react';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, getDayType } from '../utils/dateUtils';
 import { useState } from 'react';
 
 const PointCard = ({ record, onUpdate, onDelete }) => {
@@ -102,6 +102,8 @@ const PointCard = ({ record, onUpdate, onDelete }) => {
     );
   }
 
+  const dayType = getDayType(record.date);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-3">
       <div className="flex justify-between items-start mb-2">
@@ -111,6 +113,16 @@ const PointCard = ({ record, onUpdate, onDelete }) => {
             {record.isHoliday && (
               <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
                 Feriado
+              </span>
+            )}
+            {!record.isHoliday && dayType === 'saturday' && (
+              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                Sábado
+              </span>
+            )}
+            {!record.isHoliday && dayType === 'sunday' && (
+              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                Domingo
               </span>
             )}
           </div>

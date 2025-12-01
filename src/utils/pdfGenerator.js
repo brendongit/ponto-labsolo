@@ -1,13 +1,14 @@
 import React from 'react';
 import { pdf } from '@react-pdf/renderer';
 import PDFDocument from '../components/PDFDocument';
-import { formatMonth, calculateHoursByDayType, calculateUberTotals, calculateTotalHours } from './dateUtils';
+import { formatMonth, calculateHoursByDayType, calculateUberTotals, calculateTotalHours, calculatePayment } from './dateUtils';
 
-export const generatePDF = async (userName, records, year, month) => {
+export const generatePDF = async (userName, records, year, month, salaryConfig) => {
   const monthName = formatMonth(year, month);
   const hoursByDay = calculateHoursByDayType(records);
   const uberTotals = calculateUberTotals(records);
   const totalHours = calculateTotalHours(records);
+  const payment = calculatePayment(records, salaryConfig);
 
   // Criar o documento PDF usando o componente React
   const blob = await pdf(
@@ -17,7 +18,8 @@ export const generatePDF = async (userName, records, year, month) => {
       monthName,
       hoursByDay,
       uberTotals,
-      totalHours
+      totalHours,
+      payment
     })
   ).toBlob();
 
